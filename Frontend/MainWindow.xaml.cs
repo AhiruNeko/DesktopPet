@@ -1,13 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.WebSockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
 namespace Frontend
@@ -21,17 +17,7 @@ namespace Frontend
         private CancellationTokenSource _cts = new CancellationTokenSource();
         private byte[] _recvBuffer = new byte[1024];
 
-        private string path;
-        private double scale;
-        private double x;
-        private double y;
-        private double mouseX;
-        private double mouseY;
-        private bool mouseLeftDown;
-        private bool mouseLeftUp;
-        private bool mouseRightDown;
-        private bool mouseRightUp;
-        private bool mouseMove;
+        private PetStatus status = new PetStatus();
 
         public MainWindow()
         {
@@ -40,19 +26,13 @@ namespace Frontend
 
         private async void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            this.path = @"../../../../UserPets/DemoPet/1.png";
+            this.status.Path = @"../../../../UserPets/DemoPet/1.png";
             this.DisplayImage();
-            this.Width = 100;
-            this.Height = 100;
-            this.scale = 1.0;
-            this.x = this.Left;
-            this.y = this.Top;
-            this.GetMousePos();
-            this.mouseLeftDown = false;
-            this.mouseLeftUp = false;
-            this.mouseRightDown = false;
-            this.mouseRightUp = false;
-            this.mouseMove = false;
+            this.status.Width = PetImage.Source.Width;
+            this.status.Height = PetImage.Source.Height;    
+            this.status.X = this.Left;
+            this.status.Y = this.Top;
+            this.UpdateMousePos();
 
             await ConnectAndRunAsync();
         }
@@ -63,23 +43,7 @@ namespace Frontend
             {
                 await _socket.ConnectAsync(new Uri("ws://localhost:8765"), _cts.Token);
 
-                var initData = new
-                {
-                    type = "init",
-                    path = this.path,
-                    width = this.Width,
-                    height = this.Height,
-                    scale = this.scale,
-                    x = this.x,
-                    y = this.y,
-                    mouseX = this.mouseX,
-                    mouseY = this.mouseY,
-                    mouseLeftDown = this.mouseLeftDown,
-                    mouseLeftUp = this.mouseLeftUp,
-                    mouseRightDown = this.mouseRightDown,
-                    mouseRightUp = this.mouseRightUp,
-                    mouseMove = this.mouseMove
-                };
+                PetStatus initData = this.status;
 
                 string initJson = JsonSerializer.Serialize(initData);
                 byte[] initBuffer = Encoding.UTF8.GetBytes(initJson);
@@ -98,9 +62,9 @@ namespace Frontend
         {
             while (_socket.State == WebSocketState.Open)
             {
-                var data = GetData();
+                this.UpdateData();
 
-                string json = JsonSerializer.Serialize(data);
+                string json = JsonSerializer.Serialize(this.status);
                 byte[] buffer = Encoding.UTF8.GetBytes(json);
 
                 await _socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, _cts.Token);
@@ -124,9 +88,10 @@ namespace Frontend
             }
         }
 
-        private object GetData()
-        {
-            return new { type = "update" };
+        private void UpdateData()
+        {   
+            this.status.Type = "update";
+            this.UpdateMousePos();
         }
 
         private void ExcuteCommand(object command)
@@ -136,7 +101,7 @@ namespace Frontend
 
         private void DisplayImage()
         {
-            string imagePath = Path.GetFullPath(this.path);
+            string imagePath = Path.GetFullPath(this.status.Path);
             if (File.Exists(imagePath))
             {
                 BitmapImage bitmap = new BitmapImage();
@@ -158,11 +123,30 @@ namespace Frontend
             this.Top = y;
         }
 
-        private void GetMousePos()
-        { 
-            Point mPosition = PointToScreen(Mouse.GetPosition(this));
-            this.mouseX = mPosition.X;
-            this.mouseY = mPosition.Y;
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetCursorPos(out POINT lpPoint);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        private void UpdateMousePos()
+        {
+            POINT p;
+            if (GetCursorPos(out p))
+            {
+                this.status.MouseX = p.X;
+                this.status.MouseY = p.Y;
+            }
+            else
+            {
+                this.status.MouseX = -1;
+                this.status.MouseY = -1;
+            }
         }
 
     }

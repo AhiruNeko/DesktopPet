@@ -7,12 +7,20 @@
       "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\frontend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:frontend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\petstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:petstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,11 +30,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Frontend",
+              "DocumentMoniker": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\Frontend.csproj",
+              "RelativeDocumentMoniker": "Frontend.csproj",
+              "ToolTip": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\Frontend.csproj",
+              "RelativeToolTip": "Frontend.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-07-09T13:46:58.629Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "PetStatus.cs",
+              "DocumentMoniker": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\PetStatus.cs",
+              "RelativeDocumentMoniker": "PetStatus.cs",
+              "ToolTip": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\PetStatus.cs",
+              "RelativeToolTip": "PetStatus.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAowAYAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-09T13:08:20.714Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "App.xaml",
               "DocumentMoniker": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\App.xaml",
               "RelativeDocumentMoniker": "App.xaml",
@@ -38,7 +72,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
@@ -56,7 +90,7 @@
               "RelativeDocumentMoniker": "MainWindow.xaml.cs",
               "ToolTip": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\MainWindow.xaml.cs",
               "RelativeToolTip": "MainWindow.xaml.cs",
-              "ViewState": "AgIAAHYAAAAAAAAAAAAhwIoAAAA7AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-05T08:25:59.261Z",
               "EditorCaption": ""
