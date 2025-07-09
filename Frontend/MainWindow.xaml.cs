@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -16,25 +17,44 @@ namespace Frontend
     /// </summary>
     public partial class MainWindow : Window
     {
-        string path;
         private ClientWebSocket _socket = new ClientWebSocket();
         private CancellationTokenSource _cts = new CancellationTokenSource();
         private byte[] _recvBuffer = new byte[1024];
 
+        private string path;
+        private double scale;
+        private double x;
+        private double y;
+        private double mouseX;
+        private double mouseY;
+        private bool mouseLeftDown;
+        private bool mouseLeftUp;
+        private bool mouseRightDown;
+        private bool mouseRightUp;
+        private bool mouseMove;
 
         public MainWindow()
         {
             InitializeComponent();
-            Loaded += async (_, __) =>
-            {
-                await ConnectAndRunAsync();
-            };
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            this.Width = PetImage.Source.Width;
-            this.Height = PetImage.Source.Height;
+            this.path = @"../../../../UserPets/DemoPet/1.png";
+            this.DisplayImage();
+            this.Width = 100;
+            this.Height = 100;
+            this.scale = 1.0;
+            this.x = this.Left;
+            this.y = this.Top;
+            this.GetMousePos();
+            this.mouseLeftDown = false;
+            this.mouseLeftUp = false;
+            this.mouseRightDown = false;
+            this.mouseRightUp = false;
+            this.mouseMove = false;
+
+            await ConnectAndRunAsync();
         }
 
         private async Task ConnectAndRunAsync()
@@ -42,6 +62,28 @@ namespace Frontend
             try
             {
                 await _socket.ConnectAsync(new Uri("ws://localhost:8765"), _cts.Token);
+
+                var initData = new
+                {
+                    type = "init",
+                    path = this.path,
+                    width = this.Width,
+                    height = this.Height,
+                    scale = this.scale,
+                    x = this.x,
+                    y = this.y,
+                    mouseX = this.mouseX,
+                    mouseY = this.mouseY,
+                    mouseLeftDown = this.mouseLeftDown,
+                    mouseLeftUp = this.mouseLeftUp,
+                    mouseRightDown = this.mouseRightDown,
+                    mouseRightUp = this.mouseRightUp,
+                    mouseMove = this.mouseMove
+                };
+
+                string initJson = JsonSerializer.Serialize(initData);
+                byte[] initBuffer = Encoding.UTF8.GetBytes(initJson);
+                await _socket.SendAsync(new ArraySegment<byte>(initBuffer), WebSocketMessageType.Text, true, _cts.Token);
 
                 _ = Task.Run(SendLoop);
                 _ = Task.Run(ReceiveLoop);
@@ -92,9 +134,9 @@ namespace Frontend
             
         }
 
-        private void DisplayImage(string path)
+        private void DisplayImage()
         {
-            string imagePath = Path.GetFullPath(path);
+            string imagePath = Path.GetFullPath(this.path);
             if (File.Exists(imagePath))
             {
                 BitmapImage bitmap = new BitmapImage();
@@ -116,10 +158,11 @@ namespace Frontend
             this.Top = y;
         }
 
-        private double[] GetMousePos()
+        private void GetMousePos()
         { 
             Point mPosition = PointToScreen(Mouse.GetPosition(this));
-            return new double[] { mPosition.X, mPosition.Y };
+            this.mouseX = mPosition.X;
+            this.mouseY = mPosition.Y;
         }
 
     }
