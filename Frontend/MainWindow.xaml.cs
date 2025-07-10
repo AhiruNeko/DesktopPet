@@ -58,6 +58,8 @@ namespace Frontend
             }
         }
 
+        private string lastSentJson = "";
+
         private async Task SendLoop()
         {
             while (_socket.State == WebSocketState.Open)
@@ -65,9 +67,14 @@ namespace Frontend
                 this.UpdateData();
 
                 string json = JsonSerializer.Serialize(this.status);
-                byte[] buffer = Encoding.UTF8.GetBytes(json);
 
-                await _socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, _cts.Token);
+                if (json != lastSentJson)
+                {
+                    byte[] buffer = Encoding.UTF8.GetBytes(json);
+                    await _socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, _cts.Token);
+                    lastSentJson = json;
+                }
+
                 await Task.Delay(50);
             }
         }
@@ -87,6 +94,32 @@ namespace Frontend
                 }
             }
         }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            _ = CloseWebSocket();
+        }
+
+        private async Task CloseWebSocket()
+        {
+            if (_socket != null && _socket.State == WebSocketState.Open)
+            {
+                try
+                {
+                    await _socket.CloseAsync(
+                        WebSocketCloseStatus.NormalClosure,
+                        "Closing",
+                        CancellationToken.None
+                    );
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error during WebSocket close: " + ex.Message);
+                }
+            }
+        }
+
 
         private void UpdateData()
         {   

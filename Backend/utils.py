@@ -1,4 +1,5 @@
 import json
+import websockets
 
 connected = set()
 DATA = {}
@@ -17,5 +18,11 @@ async def handler(websocket):
             #     "action": "move",
             #     "target": [100, 100]
             # }))
+    except websockets.ConnectionClosedOK:
+        print("Connection closed normally.")
+    except websockets.ConnectionClosedError as e:
+        print(f"Connection closed with error: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
     finally:
-        connected.remove(websocket)
+        print("Client disconnected.")

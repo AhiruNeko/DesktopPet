@@ -16,6 +16,7 @@
         public bool MouseRightDown { get; set; }
         public bool MouseRightUp { get; set; }
         public bool MouseMove { get; set; }
+        public bool MouseOverPet { get; set; }
         public PetStatus()
         {
             Type = "init";
@@ -32,6 +33,26 @@
             MouseRightDown = false;
             MouseRightUp = false;
             MouseMove = false;
+            MouseOverPet = false;
+        }
+
+        public void copy(PetStatus AnotherStatus)
+        { 
+            this.Type = AnotherStatus.Type;
+            this.Path = AnotherStatus.Path;
+            this.Width = AnotherStatus.Width;
+            this.Height = AnotherStatus.Height;
+            this.Scale = AnotherStatus.Scale;
+            this.X = AnotherStatus.X;
+            this.Y = AnotherStatus.Y;
+            this.MouseX = AnotherStatus.MouseX;
+            this.MouseY = AnotherStatus.MouseY;
+            this.MouseLeftDown = AnotherStatus.MouseLeftDown;
+            this.MouseLeftUp = AnotherStatus.MouseLeftUp;
+            this.MouseRightDown = AnotherStatus.MouseRightDown;
+            this.MouseRightUp = AnotherStatus.MouseRightUp;
+            this.MouseMove = AnotherStatus.MouseMove;
+            this.MouseOverPet = AnotherStatus.MouseOverPet;
         }
     }
 }

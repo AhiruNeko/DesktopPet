@@ -7,12 +7,12 @@
       "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\frontend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:frontend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\petstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:petstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\frontend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|solutionrelative:frontend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{BE8F2E3C-AD90-46F8-85AC-08625035C9D6}|Frontend.csproj|d:\\okc\\projects\\codes\\others\\desktoppet\\frontend\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -34,26 +34,25 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Frontend",
+              "DocumentIndex": 2,
+              "Title": "Frontend.csproj",
               "DocumentMoniker": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\Frontend.csproj",
               "RelativeDocumentMoniker": "Frontend.csproj",
               "ToolTip": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\Frontend.csproj",
               "RelativeToolTip": "Frontend.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-07-09T13:46:58.629Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-09T13:46:58.629Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "PetStatus.cs",
               "DocumentMoniker": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\PetStatus.cs",
               "RelativeDocumentMoniker": "PetStatus.cs",
               "ToolTip": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\PetStatus.cs",
               "RelativeToolTip": "PetStatus.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAowAYAAAAqAAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAywDkAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-09T13:08:20.714Z",
               "EditorCaption": ""
@@ -67,8 +66,7 @@
               "ToolTip": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\App.xaml",
               "RelativeToolTip": "App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-07-05T10:53:12.147Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-05T10:53:12.147Z"
             },
             {
               "$type": "Document",
@@ -79,8 +77,7 @@
               "ToolTip": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\MainWindow.xaml",
               "RelativeToolTip": "MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-07-05T08:26:00.748Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-05T08:26:00.748Z"
             },
             {
               "$type": "Document",
@@ -90,7 +87,7 @@
               "RelativeDocumentMoniker": "MainWindow.xaml.cs",
               "ToolTip": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\MainWindow.xaml.cs*",
               "RelativeToolTip": "MainWindow.xaml.cs*",
-              "ViewState": "AgIAAHkAAAAAAAAAAADwv2AAAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAADEAAAAAAAAAAAAgwE0AAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-05T08:25:59.261Z",
               "EditorCaption": ""
