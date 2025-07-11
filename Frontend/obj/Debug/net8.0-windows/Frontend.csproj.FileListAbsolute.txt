@@ -41,3 +41,6 @@ D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Fronte
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Frontend.genruntimeconfig.cache
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\ref\Frontend.dll
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Frontend.sourcelink.json
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\Gma.System.MouseKeyHook.dll
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Frontend.csproj.AssemblyReference.cache
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Frontend.csproj.Up2Date

@@ -15,6 +15,10 @@
         public bool MouseLeftUp { get; set; }
         public bool MouseRightDown { get; set; }
         public bool MouseRightUp { get; set; }
+        public bool MouseLeftDoubleClick { get; set; }
+        public bool MouseLeftPressed { get; set; }
+        public bool MouseRightDoubleClick { get; set; }
+        public bool MouseRightPressed { get; set; }
         public bool MouseMove { get; set; }
         public bool MouseOverPet { get; set; }
         public PetStatus()
@@ -32,6 +36,10 @@
             MouseLeftUp = false;
             MouseRightDown = false;
             MouseRightUp = false;
+            MouseLeftDoubleClick = false;
+            MouseLeftPressed = false; 
+            MouseRightDoubleClick = false;
+            MouseRightPressed = false;
             MouseMove = false;
             MouseOverPet = false;
         }
@@ -51,6 +59,10 @@
             this.MouseLeftUp = AnotherStatus.MouseLeftUp;
             this.MouseRightDown = AnotherStatus.MouseRightDown;
             this.MouseRightUp = AnotherStatus.MouseRightUp;
+            this.MouseLeftDoubleClick = AnotherStatus.MouseLeftDoubleClick;
+            this.MouseLeftPressed = AnotherStatus.MouseLeftPressed;
+            this.MouseRightDoubleClick = AnotherStatus.MouseRightDoubleClick;
+            this.MouseRightPressed = AnotherStatus.MouseRightPressed;
             this.MouseMove = AnotherStatus.MouseMove;
             this.MouseOverPet = AnotherStatus.MouseOverPet;
         }

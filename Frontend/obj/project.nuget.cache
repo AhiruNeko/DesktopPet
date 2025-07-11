@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "bCJmsHvnu1k=",
+  "dgSpecHash": "hsz9Eu/Nmew=",
   "success": true,
   "projectFilePath": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\Frontend.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\19426\\.nuget\\packages\\mousekeyhook\\5.7.1\\mousekeyhook.5.7.1.nupkg.sha512"
+  ],
   "logs": []
 }

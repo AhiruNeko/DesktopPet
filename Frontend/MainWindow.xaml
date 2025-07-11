@@ -7,13 +7,9 @@
         mc:Ignorable="d"
         Style="{StaticResource stlWindow}" 
         Width="300" Height="300" 
-        Loaded="WindowLoaded" 
-        MouseLeftButtonDown="MouseLeftDown" 
-        MouseLeftButtonUp="MouseLeftUp" 
-        MouseRightButtonDown="MouseRightDown" 
-        MouseRightButtonUp="MouseRightUp"
-        MouseDoubleClick="DoubleClick"
-        MouseMove="ClickMove">
+        Loaded="WindowLoaded"
+        MouseMove="MouseMoveOverPet"
+        MouseLeave="MouseLeavePet">
     <Grid>
         <Image Name="PetImage" Visibility="Visible"></Image>
     </Grid>
