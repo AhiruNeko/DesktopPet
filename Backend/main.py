@@ -4,7 +4,7 @@ import utils
 
 
 async def main():
-    async with websockets.serve(utils.handler, "localhost", 8765):
+    async with websockets.serve(utils.receive_data, "localhost", 8765):
         print("Waiting for connection...")
         await asyncio.Future()
 

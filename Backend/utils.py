@@ -5,13 +5,13 @@ connected = set()
 DATA = {}
 
 
-async def handler(websocket):
+async def receive_data(websocket):
     global DATA
     connected.add(websocket)
     try:
         async for message in websocket:
             DATA = json.loads(message)
-            print("Data received：", DATA)
+            print("Receiving：", DATA)
 
             # handling data
             # await websocket.send(json.dumps({
@@ -26,3 +26,21 @@ async def handler(websocket):
         print(f"Unexpected error: {e}")
     finally:
         print("Client disconnected.")
+
+
+async def send_data(data: dict):
+    if not connected:
+        print("No clients connected.")
+        return
+
+    message = json.dumps(data)
+    disconnected = set()
+
+    for ws in connected:
+        try:
+            await ws.send(message)
+        except Exception as e:
+            print(f"Send failed: {e}")
+            disconnected.add(ws)
+
+    connected.difference_update(disconnected)
