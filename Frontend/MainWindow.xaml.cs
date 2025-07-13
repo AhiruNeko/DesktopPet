@@ -22,6 +22,10 @@ namespace Frontend {
         private NotifyIcon _trayIcon;
         private IKeyboardMouseEvents _globalHook;
         private DateTime _lastSendTime = DateTime.MinValue;
+        
+        private TaskCompletionSource<Dictionary<string, object>> _initSignal = new();
+        private bool _initialized = false;
+
 
         public MainWindow() {
             InitializeComponent();
@@ -53,19 +57,29 @@ namespace Frontend {
         }
 
         private async void WindowLoaded(object sender, RoutedEventArgs e) {
-            this.status.Path = @"../../../../UserPets/DemoPet/assets/1.png";
-            this.DisplayImage();
-            this.status.Width = PetImage.Source.Width;
-            this.status.Height = PetImage.Source.Height;    
-            this.status.X = this.Left;
-            this.status.Y = this.Top;
-            this.UpdateMousePos();
-
-            StartGlobalMouseHook();
             await ConnectAsync();
+
+            Console.WriteLine("Waiting for init signal...");
+            Dictionary<string, object> initData = await _initSignal.Task;
+
+            this.Left = Convert.ToDouble(initData["X"]);
+            this.Top = Convert.ToDouble(initData["Y"]);
+            this.Width = Convert.ToDouble(initData["Width"]);
+            this.Height = Convert.ToDouble(initData["Height"]);
+            this.status.Path = initData["Path"].ToString();
+            this.DisplayImage();
+            this.UpdateGeneralStatus();
+
+            Console.WriteLine("Init completed.");
+            StartGlobalMouseHook();
         }
 
         public async Task SendDataAsync() {
+            if (!_initialized) {
+                Console.WriteLine("Init not completed. Send aborted.");
+                return;
+            }
+
             if (_socket.State == WebSocketState.Open) {
                 try {
                     string json = JsonSerializer.Serialize(this.status);
@@ -89,6 +103,48 @@ namespace Frontend {
 
                     if (result.MessageType == WebSocketMessageType.Text) {
                         string message = Encoding.UTF8.GetString(_recvBuffer, 0, result.Count);
+
+                        if (!_initialized) {
+                            try {
+                                using var doc = JsonDocument.Parse(message);
+                                var root = doc.RootElement;
+
+                                if (root.TryGetProperty("Type", out var typeProp) && typeProp.GetString() == "init") {
+
+                                    var dict = new Dictionary<string, object>();
+                                    foreach (var prop in root.EnumerateObject()) {
+                                        switch (prop.Value.ValueKind) {
+                                            case JsonValueKind.Number:
+                                                if (prop.Value.TryGetInt32(out int intVal))
+                                                    dict[prop.Name] = intVal;
+                                                else if (prop.Value.TryGetDouble(out double doubleVal))
+                                                    dict[prop.Name] = doubleVal;
+                                                break;
+                                            case JsonValueKind.String:
+                                                dict[prop.Name] = prop.Value.GetString();
+                                                break;
+                                            case JsonValueKind.True:
+                                            case JsonValueKind.False:
+                                                dict[prop.Name] = prop.Value.GetBoolean();
+                                                break;
+                                            default:
+                                                dict[prop.Name] = prop.Value.ToString();
+                                                break;
+                                        }
+                                    }
+
+                                    _initialized = true;
+                                    _initSignal.TrySetResult(dict);
+
+                                    Console.WriteLine("Init message received.");
+                                    continue;
+                                }
+                            }
+                            catch (Exception ex) {
+                                Console.WriteLine("Init parse error: " + ex.Message);
+                            }
+                        }
+
                         System.Windows.Application.Current.Dispatcher.Invoke(() => {
                             HandleIncomingMessage(message);
                         });
@@ -100,12 +156,11 @@ namespace Frontend {
             }
         }
 
+
         public async Task ConnectAsync() {
             try {
                 await _socket.ConnectAsync(new Uri("ws://localhost:8765"), _cts.Token);
-
                 _ = Task.Run(ReceiveLoopAsync);
-
                 Console.WriteLine("WebSocket Connected.");
             }
             catch (Exception ex) {
@@ -232,8 +287,8 @@ namespace Frontend {
 
         private void UpdateGeneralStatus() {
             this.status.Type = "update";
-            this.status.Width = PetImage.Source.Width;
-            this.status.Height = PetImage.Source.Height;
+            this.status.Width = this.Width;
+            this.status.Height = this.Height;
             this.status.X = this.Left;
             this.status.Y = this.Top;
             this.UpdateMousePos();

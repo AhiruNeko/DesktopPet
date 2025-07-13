@@ -8,7 +8,20 @@ DATA = {}
 async def receive_data(websocket):
     global DATA
     connected.add(websocket)
+
+    init_data = {
+        "Type": "init",
+        "X": 0,
+        "Y": 0,
+        "Width": 200,
+        "Height": 200,
+        "Path": "D:/OKC/projects/codes/Others/DesktopPet/UserPets\Demo_Pet/assets/1.png"
+    }
+
     try:
+        await websocket.send(json.dumps(init_data))
+        print(f"Init message sent to {websocket.remote_address}")
+
         async for message in websocket:
             DATA = json.loads(message)
             print("Receiving：", DATA)
