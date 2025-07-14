@@ -8,6 +8,8 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using Gma.System.MouseKeyHook;
+using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace Frontend {
     /// <summary>
@@ -61,9 +63,9 @@ namespace Frontend {
 
             Console.WriteLine("Waiting for init signal...");
             Dictionary<string, object> initData = await _initSignal.Task;
-
-            this.Left = Convert.ToDouble(initData["X"]);
-            this.Top = Convert.ToDouble(initData["Y"]);
+            
+            this.SetLeft(Convert.ToDouble(initData["X"]));
+            this.SetTop(Convert.ToDouble(initData["Y"]));
             this.Width = Convert.ToDouble(initData["Width"]);
             this.Height = Convert.ToDouble(initData["Height"]);
             this.status.Path = initData["Path"].ToString();
@@ -74,7 +76,7 @@ namespace Frontend {
             StartGlobalMouseHook();
         }
 
-        public async Task SendDataAsync() {
+        private async Task SendDataAsync() {
             if (!_initialized) {
                 Console.WriteLine("Init not completed. Send aborted.");
                 return;
@@ -289,8 +291,8 @@ namespace Frontend {
             this.status.Type = "update";
             this.status.Width = this.Width;
             this.status.Height = this.Height;
-            this.status.X = this.Left;
-            this.status.Y = this.Top;
+            this.status.X = this.GetLeft();
+            this.status.Y = this.GetTop();
             this.UpdateMousePos();
         }
 
@@ -300,6 +302,41 @@ namespace Frontend {
 
         private void MouseLeavePet(object sender, System.Windows.Input.MouseEventArgs e) {
             this.status.MouseOverPet = false;
+        }
+        
+        private (double dpiX, double dpiY) GetDpiFactors()
+        {
+            PresentationSource source = PresentationSource.FromVisual(this);
+            if (source?.CompositionTarget != null)
+            {
+                return (source.CompositionTarget.TransformToDevice.M11,
+                    source.CompositionTarget.TransformToDevice.M22);
+            }
+            return (1.0, 1.0); // 默认 1:1
+        }
+        
+        public void SetLeft(double physicalPixelX)
+        {
+            var (dpiX, _) = GetDpiFactors();
+            this.Left = physicalPixelX / dpiX;
+        }
+
+        public void SetTop(double physicalPixelY)
+        {
+            var (_, dpiY) = GetDpiFactors();
+            this.Top = physicalPixelY / dpiY;
+        }
+
+        public double GetLeft()
+        {
+            var (dpiX, _) = GetDpiFactors();
+            return this.Left * dpiX;
+        }
+        
+        public double GetTop()
+        {
+            var (_, dpiY) = GetDpiFactors();
+            return this.Top * dpiY;
         }
 
         private void HandleIncomingMessage(String message) { 
