@@ -1,17 +1,22 @@
+import functools
 import json
+import traceback
+
 import websockets
 from Desktop_Pet import Desktop_Pet
 import os
 import importlib.util
 from Backend.registry import REGISTRY
+from Mouse import Mouse
 
 connected = set()
 DATA = {}
-PET: Desktop_Pet = None
+PET: Desktop_Pet
+MOUSE: Mouse = Mouse()
 
 
 async def receive_data(websocket):
-    global DATA
+    global DATA, MOUSE
     load_user_pet("../UserPets")
     connected.add(websocket)
     set_pet()
@@ -23,18 +28,16 @@ async def receive_data(websocket):
         async for message in websocket:
             DATA = json.loads(message)
             print("Receiving：", DATA)
+            MOUSE.update_mouse(DATA)
+            await PET.execute_interactions(MOUSE)
 
-            # handling data
-            # await websocket.send(json.dumps({
-            #     "action": "move",
-            #     "target": [100, 100]
-            # }))
     except websockets.ConnectionClosedOK:
         print("Connection closed normally.")
     except websockets.ConnectionClosedError as e:
         print(f"Connection closed with error: {e}")
     except Exception as e:
         print(f"Unexpected error: {e}")
+        traceback.print_exc()
     finally:
         print("Client disconnected.")
 
@@ -50,6 +53,7 @@ async def send_data(data: dict):
     for ws in connected:
         try:
             await ws.send(message)
+            print("Sending: " + str(data))
         except Exception as e:
             print(f"Send failed: {e}")
             disconnected.add(ws)
@@ -64,7 +68,7 @@ def set_pet():
     if "using" in settings:
         PET = REGISTRY[settings["using"]]()
     else:
-        raise "Do Not Have a Selected Pet."
+        raise Exception("Do Not Have a Selected Pet.")
 
 
 def load_user_pet(plugin_dir):
@@ -78,3 +82,8 @@ def load_user_pet(plugin_dir):
                 if spec and spec.loader:
                     module = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(module)
+
+
+def interaction(func):
+    func._is_interaction = True
+    return func

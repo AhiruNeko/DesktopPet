@@ -232,11 +232,6 @@ namespace Frontend {
             }
         }
 
-        private void SetPos(int x, int y) { 
-            this.Left = x;
-            this.Top = y;
-        }
-
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetCursorPos(out POINT lpPoint);
@@ -323,6 +318,17 @@ namespace Frontend {
 
         private void HandleIncomingMessage(string message) { 
             Message msg = ParseMessage(message);
+            if (msg.Type == "update") {
+                if (this.status.Path != msg.Path) {
+                    this.status.Path = msg.Path;
+                    this.DisplayImage();
+                }
+                this.Height = msg.Height;
+                this.Width = msg.Width;
+                this.SetLeft(msg.X);
+                this.SetTop(msg.Y);
+                this.UpdateGeneralStatus();
+            }
         }
 
     }

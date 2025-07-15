@@ -12,6 +12,24 @@ class Status:
         self.X = 0
         self.Y = 0
 
+    def __eq__(self, other):
+        if not isinstance(other, Status):
+            return False
+        return (
+            self.Type == other.Type and
+            self.Path == other.Path and
+            self.Width == other.Width and
+            self.Height == other.Height and
+            self.X == other.X and
+            self.Y == other.Y
+        )
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        if "pet" in state:
+            del state["pet"]
+        return state
+
     def serialization(self):
         return {
             "Type": self.Type,
