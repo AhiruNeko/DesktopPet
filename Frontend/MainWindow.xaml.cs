@@ -8,8 +8,6 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using Gma.System.MouseKeyHook;
-using System.Windows.Interop;
-using System.Windows.Media;
 
 namespace Frontend {
     /// <summary>
@@ -25,7 +23,7 @@ namespace Frontend {
         private IKeyboardMouseEvents _globalHook;
         private DateTime _lastSendTime = DateTime.MinValue;
         
-        private TaskCompletionSource<Dictionary<string, object>> _initSignal = new();
+        private TaskCompletionSource<Message> _initSignal = new();
         private bool _initialized = false;
 
 
@@ -62,13 +60,13 @@ namespace Frontend {
             await ConnectAsync();
 
             Console.WriteLine("Waiting for init signal...");
-            Dictionary<string, object> initData = await _initSignal.Task;
+            Message initData = await _initSignal.Task;
             
-            this.SetLeft(Convert.ToDouble(initData["X"]));
-            this.SetTop(Convert.ToDouble(initData["Y"]));
-            this.Width = Convert.ToDouble(initData["Width"]);
-            this.Height = Convert.ToDouble(initData["Height"]);
-            this.status.Path = initData["Path"].ToString();
+            this.SetLeft(initData.X);
+            this.SetTop(initData.Y);
+            this.Width = initData.Width;
+            this.Height = initData.Height;
+            this.status.Path = initData.Path;
             this.DisplayImage();
             this.UpdateGeneralStatus();
 
@@ -106,43 +104,21 @@ namespace Frontend {
                     if (result.MessageType == WebSocketMessageType.Text) {
                         string message = Encoding.UTF8.GetString(_recvBuffer, 0, result.Count);
 
-                        if (!_initialized) {
-                            try {
-                                using var doc = JsonDocument.Parse(message);
-                                var root = doc.RootElement;
-
-                                if (root.TryGetProperty("Type", out var typeProp) && typeProp.GetString() == "init") {
-
-                                    var dict = new Dictionary<string, object>();
-                                    foreach (var prop in root.EnumerateObject()) {
-                                        switch (prop.Value.ValueKind) {
-                                            case JsonValueKind.Number:
-                                                if (prop.Value.TryGetInt32(out int intVal))
-                                                    dict[prop.Name] = intVal;
-                                                else if (prop.Value.TryGetDouble(out double doubleVal))
-                                                    dict[prop.Name] = doubleVal;
-                                                break;
-                                            case JsonValueKind.String:
-                                                dict[prop.Name] = prop.Value.GetString();
-                                                break;
-                                            case JsonValueKind.True:
-                                            case JsonValueKind.False:
-                                                dict[prop.Name] = prop.Value.GetBoolean();
-                                                break;
-                                            default:
-                                                dict[prop.Name] = prop.Value.ToString();
-                                                break;
-                                        }
-                                    }
-
+                        if (!_initialized)
+                        {
+                            try
+                            {
+                                var msg = ParseMessage(message);
+                                if (msg.Type == "init")
+                                {
                                     _initialized = true;
-                                    _initSignal.TrySetResult(dict);
-
+                                    _initSignal.TrySetResult(msg);
                                     Console.WriteLine("Init message received.");
                                     continue;
                                 }
                             }
-                            catch (Exception ex) {
+                            catch (Exception ex)
+                            {
                                 Console.WriteLine("Init parse error: " + ex.Message);
                             }
                         }
@@ -241,10 +217,6 @@ namespace Frontend {
             this.status.MouseMove = false;
         }
 
-        private void ExcuteCommand(object command) { 
-            
-        }
-
         private void DisplayImage() {
             string imagePath = Path.GetFullPath(this.status.Path);
             if (File.Exists(imagePath)) {
@@ -304,42 +276,53 @@ namespace Frontend {
             this.status.MouseOverPet = false;
         }
         
-        private (double dpiX, double dpiY) GetDpiFactors()
-        {
+        private (double dpiX, double dpiY) GetDpiFactors() {
             PresentationSource source = PresentationSource.FromVisual(this);
-            if (source?.CompositionTarget != null)
-            {
+            if (source?.CompositionTarget != null) {
                 return (source.CompositionTarget.TransformToDevice.M11,
                     source.CompositionTarget.TransformToDevice.M22);
             }
-            return (1.0, 1.0); // 默认 1:1
+            return (1.0, 1.0);
         }
         
-        public void SetLeft(double physicalPixelX)
-        {
+        private void SetLeft(double physicalPixelX) {
             var (dpiX, _) = GetDpiFactors();
             this.Left = physicalPixelX / dpiX;
         }
 
-        public void SetTop(double physicalPixelY)
-        {
+        private void SetTop(double physicalPixelY) {
             var (_, dpiY) = GetDpiFactors();
             this.Top = physicalPixelY / dpiY;
         }
 
-        public double GetLeft()
-        {
+        private double GetLeft() {
             var (dpiX, _) = GetDpiFactors();
             return this.Left * dpiX;
         }
         
-        public double GetTop()
-        {
+        private double GetTop() {
             var (_, dpiY) = GetDpiFactors();
             return this.Top * dpiY;
         }
+        
+        public static Message ParseMessage(string json) {
+            try {
+                var options = new JsonSerializerOptions {
+                    PropertyNameCaseInsensitive = false
+                };
+                var msg = JsonSerializer.Deserialize<Message>(json, options);
+                if (msg == null) {
+                    throw new JsonException("Failed to deserialize JSON into Message object.");
+                }
+                return msg;
+            }
+            catch (Exception ex) {
+                throw new JsonException("Error during JSON deserialization: " + ex.Message, ex);
+            }
+        }
 
-        private void HandleIncomingMessage(String message) { 
+        private void HandleIncomingMessage(string message) { 
+            Message msg = ParseMessage(message);
         }
 
     }
