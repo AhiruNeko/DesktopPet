@@ -1,9 +1,12 @@
 import json
 import ctypes
-
+import copy
+import inspect
+import asyncio
 from Backend.Mouse import Mouse
 from Status import Status
-import copy
+import Interaction_Result
+from typing import Callable, Awaitable, Optional
 
 
 class Desktop_Pet:
@@ -45,40 +48,109 @@ class Desktop_Pet:
         self.mouse_event: Mouse
         self.pre_status = copy.deepcopy(self.status)
 
+        self._motion_task: Optional[asyncio.Task] = None
+        self._motion_priority: int = 0
+        self._animation_loop_task = asyncio.create_task(self._animation_loop())
+        self.animation_fps = 30
+        self.frame_interval = 1 / self.animation_fps
+
         self.dx = 0
         self.dy = 0
 
     async def send_data(self, send_type="update"):
         import utils
         if self.pre_status == self.status and send_type == "update":
-            return True
+            return
         self.status.set_type(send_type)
         await utils.send_data(self.status.serialization())
         self.pre_status = copy.deepcopy(self.status)
-        return True
 
     async def execute_interactions(self, mouse_event: Mouse):
         self.mouse_event = mouse_event
         for func in self.interactions:
-            if func():
-                await self.send_data()
+
+            priority = getattr(func, "_interaction_priority", 0)
+            if self._motion_task and not self._motion_task.done():
+                if self._motion_priority <= priority:
+                    continue
+
+            result_or_coro = func()
+            if inspect.isawaitable(result_or_coro):
+                result = await result_or_coro
+            else:
+                result = result_or_coro
+
+            if result == Interaction_Result.SUCCESS:
+                if self._motion_task and not self._motion_task.done():
+                    self._motion_task.cancel()
                 break
+            elif result == Interaction_Result.PASS:
+                continue
+            elif result == Interaction_Result.FAIL:
+                break
+            elif result == Interaction_Result.CONTINUE:
+                if self._motion_task and not self._motion_task.done():
+                    self._motion_task.cancel()
+                continue
+
         else:
             self.status.set_path(self.config["default"])
+
+        if not self._motion_task or self._motion_task.done():
             await self.send_data("update")
 
-    def dragging(self):
+    def start_motion(self, coro_fn: Callable[[], Awaitable], priority: int):
+        if self._motion_task and not self._motion_task.done():
+            if self._motion_priority <= priority:
+                return
+            else:
+                self._motion_task.cancel()
+
+        self._motion_priority = priority
+        self._motion_task = asyncio.create_task(self._wrap_motion(coro_fn))
+
+    async def _wrap_motion(self, coro_fn: Callable[[], Awaitable]):
+        try:
+            await coro_fn()
+        except asyncio.CancelledError:
+            pass
+        finally:
+            self._motion_task = None
+            self._motion_priority = 0
+
+    async def _animation_loop(self):
+        while True:
+            if self._motion_task and not self._motion_task.done():
+                await self.send_data("update")
+            await asyncio.sleep(self.frame_interval)
+
+    async def wait_frames(self, frame_count: int):
+        await asyncio.sleep(frame_count * self.frame_interval)
+
+    def seconds_to_frames(self, seconds: float) -> int:
+        return int(seconds * self.animation_fps)
+
+    def frames_to_seconds(self, frames: int) -> float:
+        return frames / self.animation_fps
+
+    def dragging(self) -> Interaction_Result:
         if self.mouse_event.mouse_left_down and self.mouse_event.mouse_over_pet:
             self.dx = self.status.X - self.mouse_event.mouse_x
             self.dy = self.status.Y - self.mouse_event.mouse_y
         if self.mouse_event.mouse_left_pressed and self.mouse_event.mouse_over_pet and self.mouse_event.mouse_move:
             self.status.X = self.dx + self.mouse_event.mouse_x
             self.status.Y = self.dy + self.mouse_event.mouse_y
-            return True
-        return False
+            return Interaction_Result.SUCCESS
+        return Interaction_Result.PASS
 
-    def left_click(self, path):
+    def left_pressed(self, path) -> Interaction_Result:
         if self.mouse_event.mouse_left_pressed and self.mouse_event.mouse_over_pet:
             self.status.set_path(path)
-            return True
-        return False
+            return Interaction_Result.SUCCESS
+        return Interaction_Result.PASS
+
+    def right_pressed(self, path) -> Interaction_Result:
+        if self.mouse_event.mouse_right_pressed and self.mouse_event.mouse_over_pet:
+            self.status.set_path(path)
+            return Interaction_Result.SUCCESS
+        return Interaction_Result.PASS

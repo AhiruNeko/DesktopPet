@@ -23,3 +23,16 @@ class Mouse:
         self.mouse_right_pressed = data["MouseRightPressed"]
         self.mouse_move = data["MouseMove"]
         self.mouse_over_pet = data["MouseOverPet"]
+
+    @property
+    def no_event(self):
+        return not any([
+            self.mouse_left_down,
+            self.mouse_left_up,
+            self.mouse_right_down,
+            self.mouse_right_up,
+            self.mouse_left_pressed,
+            self.mouse_right_pressed,
+            self.mouse_move,
+            self.mouse_over_pet
+        ])

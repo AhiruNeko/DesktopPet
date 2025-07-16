@@ -1,4 +1,4 @@
-import os
+import os, copy
 
 
 class Status:
@@ -24,11 +24,17 @@ class Status:
             self.Y == other.Y
         )
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        if "pet" in state:
-            del state["pet"]
-        return state
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+
+        for k, v in self.__dict__.items():
+            if k == "pet":
+                setattr(result, k, v)  # 👈 浅拷贝 pet
+            else:
+                setattr(result, k, copy.deepcopy(v, memo))
+        return result
 
     def serialization(self):
         return {
