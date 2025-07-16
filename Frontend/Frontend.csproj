@@ -14,6 +14,7 @@
 	
   <ItemGroup>
     <PackageReference Include="MouseKeyHook" Version="5.7.1" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,8 @@ import ctypes
 import copy
 import inspect
 import asyncio
+from collections import deque
+
 from Backend.Mouse import Mouse
 from Status import Status
 import Interaction_Result
@@ -22,12 +24,12 @@ class Desktop_Pet:
 
         user32 = ctypes.windll.user32
         user32.SetProcessDPIAware()
-        screen_width = user32.GetSystemMetrics(0)
-        screen_height = user32.GetSystemMetrics(1)
+        self.screen_width = user32.GetSystemMetrics(0)
+        self.screen_height = user32.GetSystemMetrics(1)
 
         self.status = Status(self)
-        self.status.set_x(self.config["x"] if "x" in self.config else screen_width - 350)
-        self.status.set_y(self.config["y"] if "y" in self.config else screen_height - 400)
+        self.status.set_x(self.config["x"] if "x" in self.config else self.screen_width - 350)
+        self.status.set_y(self.config["y"] if "y" in self.config else self.screen_height - 400)
         self.status.set_width(self.config["width"] if "width" in self.config else 200)
         self.status.set_height(self.config["height"] if "height" in self.config else 200)
         if "default" in self.config:
@@ -50,12 +52,17 @@ class Desktop_Pet:
 
         self._motion_task: Optional[asyncio.Task] = None
         self._motion_priority: int = 0
-        self._animation_loop_task = asyncio.create_task(self._animation_loop())
+        self.frame_timer = 0
         self.animation_fps = 30
         self.frame_interval = 1 / self.animation_fps
+        self._animation_loop_task = asyncio.create_task(self._animation_loop())
 
         self.dx = 0
         self.dy = 0
+        self._position_history = deque(maxlen=5)
+
+    def get_screen_size(self):
+        return self.screen_width, self.screen_height
 
     async def send_data(self, send_type="update"):
         import utils
@@ -65,42 +72,59 @@ class Desktop_Pet:
         await utils.send_data(self.status.serialization())
         self.pre_status = copy.deepcopy(self.status)
 
-    async def execute_interactions(self, mouse_event: Mouse):
+    async def execute_interactions(self, mouse_event: Mouse, recv_data):
         self.mouse_event = mouse_event
         anime_cancel = False
-        for func in self.interactions:
+        if recv_data["Type"] == "update":
+            for func in self.interactions:
 
-            priority = getattr(func, "_interaction_priority", 0)
-            if self._motion_task and not self._motion_task.done():
-                if self._motion_priority <= priority:
+                priority = getattr(func, "_interaction_priority", 0)
+                if self._motion_task and not self._motion_task.done():
+                    if self._motion_priority <= priority:
+                        continue
+
+                result_or_coro = func()
+                if inspect.isawaitable(result_or_coro):
+                    result = await result_or_coro
+                else:
+                    result = result_or_coro
+
+                if result == Interaction_Result.SUCCESS:
+                    if self._motion_task and not self._motion_task.done():
+                        self._motion_task.cancel()
+                        anime_cancel = True
+                    break
+                elif result == Interaction_Result.PASS:
+                    continue
+                elif result == Interaction_Result.FAIL:
+                    break
+                elif result == Interaction_Result.CONTINUE:
+                    if self._motion_task and not self._motion_task.done():
+                        self._motion_task.cancel()
+                        anime_cancel = True
                     continue
 
-            result_or_coro = func()
-            if inspect.isawaitable(result_or_coro):
-                result = await result_or_coro
             else:
-                result = result_or_coro
-
-            if result == Interaction_Result.SUCCESS:
-                if self._motion_task and not self._motion_task.done():
-                    self._motion_task.cancel()
-                    anime_cancel = True
-                break
-            elif result == Interaction_Result.PASS:
-                continue
-            elif result == Interaction_Result.FAIL:
-                break
-            elif result == Interaction_Result.CONTINUE:
-                if self._motion_task and not self._motion_task.done():
-                    self._motion_task.cancel()
-                    anime_cancel = True
-                continue
-
-        else:
-            self.status.set_path(self.config["default"])
+                self.status.set_path(self.config["default"])
+        elif recv_data["Type"] == "reset":
+            self.status.set_path(recv_data["Path"])
+            self.status.set_x(recv_data["X"])
+            self.status.set_y(recv_data["Y"])
+            self.status.set_width(recv_data["Width"])
+            self.status.set_height(recv_data["Height"])
 
         if not self._motion_task or self._motion_task.done() or anime_cancel:
             await self.send_data("update")
+
+    def get_velocity(self):
+        if len(self._position_history) < 2:
+            return 0.0, 0.0
+
+        dx = self._position_history[-1][0] - self._position_history[0][0]
+        dy = self._position_history[-1][1] - self._position_history[0][1]
+        frame_count = len(self._position_history) - 1
+
+        return dx / frame_count, dy / frame_count
 
     def start_motion(self, coro_fn: Callable[[], Awaitable], priority: int):
         if self._motion_task and not self._motion_task.done():
@@ -123,6 +147,8 @@ class Desktop_Pet:
 
     async def _animation_loop(self):
         while True:
+            self.frame_timer += 1
+            self._position_history.append((self.status.X, self.status.Y))
             if self._motion_task and not self._motion_task.done():
                 await self.send_data("update")
             await asyncio.sleep(self.frame_interval)

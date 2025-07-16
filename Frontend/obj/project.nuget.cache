@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "hsz9Eu/Nmew=",
+  "dgSpecHash": "C7zgz2Nmj48=",
   "success": true,
   "projectFilePath": "D:\\OKC\\projects\\codes\\Others\\DesktopPet\\Frontend\\Frontend.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\19426\\.nuget\\packages\\mousekeyhook\\5.7.1\\mousekeyhook.5.7.1.nupkg.sha512"
+    "C:\\Users\\19426\\.nuget\\packages\\mousekeyhook\\5.7.1\\mousekeyhook.5.7.1.nupkg.sha512",
+    "C:\\Users\\19426\\.nuget\\packages\\wpfanimatedgif\\2.0.2\\wpfanimatedgif.2.0.2.nupkg.sha512"
   ],
   "logs": []
 }

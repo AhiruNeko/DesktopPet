@@ -31,7 +31,7 @@ async def receive_data(websocket):
             DATA = json.loads(message)
             print("Receiving：", DATA)
             MOUSE.update_mouse(DATA)
-            await PET.execute_interactions(MOUSE)
+            await PET.execute_interactions(MOUSE, DATA)
 
     except websockets.ConnectionClosedOK:
         print("Connection closed normally.")

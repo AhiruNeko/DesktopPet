@@ -44,3 +44,4 @@ D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Fronte
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\Gma.System.MouseKeyHook.dll
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Frontend.csproj.AssemblyReference.cache
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Frontend.csproj.Up2Date
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\WpfAnimatedGif.dll

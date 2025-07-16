@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using Gma.System.MouseKeyHook;
+using WpfAnimatedGif;
 
 namespace Frontend {
     /// <summary>
@@ -25,6 +26,9 @@ namespace Frontend {
         
         private TaskCompletionSource<Message> _initSignal = new();
         private bool _initialized = false;
+
+        private double _initX, _initY, _initWidth, _initHeight;
+        private string _initPath;
 
 
         public MainWindow() {
@@ -54,6 +58,16 @@ namespace Frontend {
                 System.Windows.Application.Current.Shutdown();
             });
             _trayIcon.ContextMenuStrip = menu;
+            menu.Items.Add("Reset", null, async (s, e) => {
+                this.SetLeft(_initX);
+                this.SetTop(_initY);
+                this.Width = _initWidth;
+                this.Height = _initHeight;
+                this.status.Path = this._initPath;
+                this.Display();
+                this.UpdateGeneralStatus("reset");
+                await SendDataAsync();
+            });
         }
 
         private async void WindowLoaded(object sender, RoutedEventArgs e) {
@@ -62,12 +76,18 @@ namespace Frontend {
             Console.WriteLine("Waiting for init signal...");
             Message initData = await _initSignal.Task;
             
+            this._initX = initData.X;
+            this._initY = initData.Y;
+            this._initWidth = initData.Width;
+            this._initHeight = initData.Height;
+            this._initPath = initData.Path;
+            
             this.SetLeft(initData.X);
             this.SetTop(initData.Y);
             this.Width = initData.Width;
             this.Height = initData.Height;
             this.status.Path = initData.Path;
-            this.DisplayImage();
+            this.Display();
             this.UpdateGeneralStatus();
 
             Console.WriteLine("Init completed.");
@@ -217,17 +237,17 @@ namespace Frontend {
             this.status.MouseMove = false;
         }
 
-        private void DisplayImage() {
+        private void Display()
+        {
             string imagePath = Path.GetFullPath(this.status.Path);
-            if (File.Exists(imagePath)) {
-                BitmapImage bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(imagePath);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                PetImage.Source = bitmap;
+            if (File.Exists(imagePath))
+            {
+                var imageUri = new Uri(imagePath);
+                var image = new BitmapImage(imageUri);
+                ImageBehavior.SetAnimatedSource(PetImage, image);
             }
-            else {
+            else
+            {
                 Console.WriteLine("Invalid Path");
             }
         }
@@ -254,8 +274,8 @@ namespace Frontend {
             }
         }
 
-        private void UpdateGeneralStatus() {
-            this.status.Type = "update";
+        private void UpdateGeneralStatus(string updateType="update") {
+            this.status.Type = updateType;
             this.status.Width = this.Width;
             this.status.Height = this.Height;
             this.status.X = this.GetLeft();
@@ -321,7 +341,7 @@ namespace Frontend {
             if (msg.Type == "update") {
                 if (this.status.Path != msg.Path) {
                     this.status.Path = msg.Path;
-                    this.DisplayImage();
+                    this.Display();
                 }
                 this.Height = msg.Height;
                 this.Width = msg.Width;

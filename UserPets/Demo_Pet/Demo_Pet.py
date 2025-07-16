@@ -1,7 +1,7 @@
 from Backend.Desktop_Pet import Desktop_Pet
 from Backend.registry import register
 from Backend.utils import interaction
-import asyncio
+from collections import deque
 from Backend import Interaction_Result
 
 
@@ -12,18 +12,18 @@ class Demo_Pet(Desktop_Pet):
         super().__init__()
 
     @interaction(priority=0)
-    def left_click(self):
-        return super().left_pressed("2.png")
+    def dragging(self):
+        if self.mouse_event.mouse_left_up and self.mouse_event.mouse_over_pet:
+            self.start_motion(self.anime, priority=1)
+            return Interaction_Result.SUCCESS
+        else:
+            return super().dragging()
 
-    @interaction(priority=1)
-    async def move(self):
-        if self.mouse_event.mouse_right_pressed and self.mouse_event.mouse_over_pet:
-            self.start_motion(self._move_animation, priority=1)
-            return Interaction_Result.CONTINUE
-        return Interaction_Result.PASS
-
-    async def _move_animation(self):
-        for _ in range(30):
-            self.status.X -= 15
+    async def anime(self):
+        vec_x, vec_y = self.get_velocity()
+        while abs(vec_x) >= 0.5 or abs(vec_y) >= 0.5:
+            self.status.X += vec_x
+            self.status.Y += vec_y
+            vec_x /= 1.2
+            vec_y /= 1.2
             await self.wait_frames(1)
-
