@@ -33,13 +33,20 @@ class Desktop_Pet:
             raise Exception("Missing Default")
 
         self.interactions = []
+        methods = []
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if callable(attr) and getattr(attr, "_is_interaction", False):
-                self.interactions.append(attr)
+                priority = getattr(attr, "_interaction_priority", 0)
+                methods.append((priority, attr))
+        methods.sort(key=lambda x: x[0])
+        self.interactions = [method for _, method in methods]
 
         self.mouse_event: Mouse
         self.pre_status = copy.deepcopy(self.status)
+
+        self.dx = 0
+        self.dy = 0
 
     async def send_data(self, send_type="update"):
         import utils
@@ -53,8 +60,25 @@ class Desktop_Pet:
     async def execute_interactions(self, mouse_event: Mouse):
         self.mouse_event = mouse_event
         for func in self.interactions:
-            if await func():
+            if func():
+                await self.send_data()
                 break
         else:
             self.status.set_path(self.config["default"])
             await self.send_data("update")
+
+    def dragging(self):
+        if self.mouse_event.mouse_left_down and self.mouse_event.mouse_over_pet:
+            self.dx = self.status.X - self.mouse_event.mouse_x
+            self.dy = self.status.Y - self.mouse_event.mouse_y
+        if self.mouse_event.mouse_left_pressed and self.mouse_event.mouse_over_pet and self.mouse_event.mouse_move:
+            self.status.X = self.dx + self.mouse_event.mouse_x
+            self.status.Y = self.dy + self.mouse_event.mouse_y
+            return True
+        return False
+
+    def left_click(self, path):
+        if self.mouse_event.mouse_left_pressed and self.mouse_event.mouse_over_pet:
+            self.status.set_path(path)
+            return True
+        return False

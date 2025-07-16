@@ -84,6 +84,10 @@ def load_user_pet(plugin_dir):
                     spec.loader.exec_module(module)
 
 
-def interaction(func):
-    func._is_interaction = True
-    return func
+def interaction(priority=0):
+    def decorator(func):
+        func._is_interaction = True
+        func._interaction_priority = priority
+        return func
+    return decorator
+
