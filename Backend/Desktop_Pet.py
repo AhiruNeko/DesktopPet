@@ -67,6 +67,7 @@ class Desktop_Pet:
 
     async def execute_interactions(self, mouse_event: Mouse):
         self.mouse_event = mouse_event
+        anime_cancel = False
         for func in self.interactions:
 
             priority = getattr(func, "_interaction_priority", 0)
@@ -83,6 +84,7 @@ class Desktop_Pet:
             if result == Interaction_Result.SUCCESS:
                 if self._motion_task and not self._motion_task.done():
                     self._motion_task.cancel()
+                    anime_cancel = True
                 break
             elif result == Interaction_Result.PASS:
                 continue
@@ -91,12 +93,13 @@ class Desktop_Pet:
             elif result == Interaction_Result.CONTINUE:
                 if self._motion_task and not self._motion_task.done():
                     self._motion_task.cancel()
+                    anime_cancel = True
                 continue
 
         else:
             self.status.set_path(self.config["default"])
 
-        if not self._motion_task or self._motion_task.done():
+        if not self._motion_task or self._motion_task.done() or anime_cancel:
             await self.send_data("update")
 
     def start_motion(self, coro_fn: Callable[[], Awaitable], priority: int):
