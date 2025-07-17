@@ -29,7 +29,7 @@ class Desktop_Pet:
 
         self.status = Status(self)
         self.status.set_x(self.config["x"] if "x" in self.config else self.screen_width - 350)
-        self.status.set_y(self.config["y"] if "y" in self.config else self.screen_height - 400)
+        self.status.set_y(self.config["y"] if "y" in self.config else self.screen_height - 350)
         self.status.set_width(self.config["width"] if "width" in self.config else 200)
         self.status.set_height(self.config["height"] if "height" in self.config else 200)
         if "default" in self.config:
@@ -47,6 +47,12 @@ class Desktop_Pet:
         methods.sort(key=lambda x: x[0])
         self.interactions = [method for _, method in methods]
 
+        self.monitor = None
+        for attr_name in dir(self):
+            attr = getattr(self, attr_name)
+            if callable(attr) and getattr(attr, "_is_monitor", False):
+                self.monitor = attr
+
         self.mouse_event: Mouse
         self.pre_status = copy.deepcopy(self.status)
 
@@ -57,6 +63,8 @@ class Desktop_Pet:
         self.frame_interval = 1 / self.animation_fps
         self._animation_loop_task = asyncio.create_task(self._animation_loop())
 
+        self._send_lock = asyncio.Lock()
+
         self.dx = 0
         self.dy = 0
         self._position_history = deque(maxlen=5)
@@ -66,11 +74,12 @@ class Desktop_Pet:
 
     async def send_data(self, send_type="update"):
         import utils
-        if self.pre_status == self.status and send_type == "update":
-            return
-        self.status.set_type(send_type)
-        await utils.send_data(self.status.serialization())
-        self.pre_status = copy.deepcopy(self.status)
+        async with self._send_lock:
+            if self.pre_status == self.status and send_type == "update":
+                return
+            self.status.set_type(send_type)
+            await utils.send_data(self.status.serialization())
+            self.pre_status = copy.deepcopy(self.status)
 
     async def execute_interactions(self, mouse_event: Mouse, recv_data):
         self.mouse_event = mouse_event
@@ -103,9 +112,9 @@ class Desktop_Pet:
                         self._motion_task.cancel()
                         anime_cancel = True
                     continue
-
             else:
-                self.status.set_path(self.config["default"])
+                if not self._motion_task or self._motion_task.done():
+                    self.status.set_path(self.config["default"])
         elif recv_data["Type"] == "reset":
             self.status.set_path(recv_data["Path"])
             self.status.set_x(recv_data["X"])
@@ -149,8 +158,12 @@ class Desktop_Pet:
         while True:
             self.frame_timer += 1
             self._position_history.append((self.status.X, self.status.Y))
-            if self._motion_task and not self._motion_task.done():
-                await self.send_data("update")
+            if self.monitor:
+                if inspect.isawaitable(self.monitor):
+                    await self.monitor()
+                else:
+                    self.monitor()
+            await self.send_data("update")
             await asyncio.sleep(self.frame_interval)
 
     async def wait_frames(self, frame_count: int):
@@ -162,7 +175,7 @@ class Desktop_Pet:
     def frames_to_seconds(self, frames: int) -> float:
         return frames / self.animation_fps
 
-    def dragging(self) -> Interaction_Result:
+    def dragging(self, decay=0.8, min_v=0.5, anime_priority=0) -> Interaction_Result:
         if self.mouse_event.mouse_left_down and self.mouse_event.mouse_over_pet:
             self.dx = self.status.X - self.mouse_event.mouse_x
             self.dy = self.status.Y - self.mouse_event.mouse_y

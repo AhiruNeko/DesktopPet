@@ -61,8 +61,8 @@ namespace Frontend {
             menu.Items.Add("Reset", null, async (s, e) => {
                 this.SetLeft(_initX);
                 this.SetTop(_initY);
-                this.Width = _initWidth;
-                this.Height = _initHeight;
+                this.SetWidth(_initWidth);
+                this.SetHeight(_initHeight);
                 this.status.Path = this._initPath;
                 this.Display();
                 this.UpdateGeneralStatus("reset");
@@ -84,8 +84,8 @@ namespace Frontend {
             
             this.SetLeft(initData.X);
             this.SetTop(initData.Y);
-            this.Width = initData.Width;
-            this.Height = initData.Height;
+            this.SetWidth(initData.Width);
+            this.SetHeight(initData.Height);
             this.status.Path = initData.Path;
             this.Display();
             this.UpdateGeneralStatus();
@@ -276,8 +276,8 @@ namespace Frontend {
 
         private void UpdateGeneralStatus(string updateType="update") {
             this.status.Type = updateType;
-            this.status.Width = this.Width;
-            this.status.Height = this.Height;
+            this.status.Width = this.GetWidth();
+            this.status.Height = this.GetHeight();
             this.status.X = this.GetLeft();
             this.status.Y = this.GetTop();
             this.UpdateMousePos();
@@ -320,6 +320,30 @@ namespace Frontend {
             return this.Top * dpiY;
         }
         
+        public void SetWidth(double logicalWidth)
+        {
+            var (dpiX, _) = GetDpiFactors();
+            this.Width = logicalWidth / dpiX; // 反算成 WPF 单位
+        }
+
+        public void SetHeight(double logicalHeight)
+        {
+            var (_, dpiY) = GetDpiFactors();
+            this.Height = logicalHeight / dpiY; // 反算成 WPF 单位
+        }
+
+        public double GetWidth()
+        {
+            var (dpiX, _) = GetDpiFactors();
+            return this.Width * dpiX;  // 转换成逻辑像素
+        }
+
+        public double GetHeight()
+        {
+            var (_, dpiY) = GetDpiFactors();
+            return this.Height * dpiY;  // 转换成逻辑像素
+        }
+        
         public static Message ParseMessage(string json) {
             try {
                 var options = new JsonSerializerOptions {
@@ -343,8 +367,8 @@ namespace Frontend {
                     this.status.Path = msg.Path;
                     this.Display();
                 }
-                this.Height = msg.Height;
-                this.Width = msg.Width;
+                this.SetWidth(msg.Width);
+                this.SetHeight(msg.Height);
                 this.SetLeft(msg.X);
                 this.SetTop(msg.Y);
                 this.UpdateGeneralStatus();

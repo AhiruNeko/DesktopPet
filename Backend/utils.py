@@ -93,3 +93,8 @@ def interaction(priority=0):
         return func
     return decorator
 
+
+def monitor(func):
+    func._is_monitor = True
+    return func
+
