@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using Gma.System.MouseKeyHook;
 using WpfAnimatedGif;
+using NAudio.Wave;
 
 namespace Frontend {
     /// <summary>
@@ -25,12 +26,14 @@ namespace Frontend {
         private DateTime _lastSendTime = DateTime.MinValue;
         
         private TaskCompletionSource<Message> _initSignal = new();
-        private bool _initialized = false;
+        private bool _initialized, _initPlaySound = false;
 
         private double _initX, _initY, _initWidth, _initHeight;
-        private string _initPath;
-
-
+        private string _initPath, _initSoundPath;
+        
+        private IWavePlayer waveOut;
+        private AudioFileReader audioFile;
+        
         public MainWindow() {
             InitializeComponent();
             InitializeTrayIcon();
@@ -64,7 +67,10 @@ namespace Frontend {
                 this.SetWidth(_initWidth);
                 this.SetHeight(_initHeight);
                 this.status.Path = this._initPath;
+                this.status.SoundPath = this._initSoundPath;
+                this.status.PlaySound = this._initPlaySound;
                 this.Display();
+                this.PlaySound();
                 this.UpdateGeneralStatus("reset");
                 await SendDataAsync();
             });
@@ -81,13 +87,18 @@ namespace Frontend {
             this._initWidth = initData.Width;
             this._initHeight = initData.Height;
             this._initPath = initData.Path;
+            this._initSoundPath = initData.SoundPath;
+            this._initPlaySound = initData.PlaySound;
             
             this.SetLeft(initData.X);
             this.SetTop(initData.Y);
             this.SetWidth(initData.Width);
             this.SetHeight(initData.Height);
             this.status.Path = initData.Path;
+            this.status.SoundPath = initData.SoundPath;
+            this.status.PlaySound = initData.PlaySound;
             this.Display();
+            this.PlaySound();
             this.UpdateGeneralStatus();
 
             Console.WriteLine("Init completed.");
@@ -251,6 +262,25 @@ namespace Frontend {
                 Console.WriteLine("Invalid Path");
             }
         }
+        
+        public void PlaySound()
+        {
+            if (this.status.PlaySound) {
+                try {
+                    waveOut?.Stop();
+                    waveOut?.Dispose();
+                    audioFile?.Dispose();
+
+                    audioFile = new AudioFileReader(this.status.SoundPath);
+                    waveOut = new WaveOutEvent();
+                    waveOut.Init(audioFile);
+                    waveOut.Play();
+                }
+                catch (Exception ex) {
+                    Console.WriteLine($"Sound Play Error: {ex.Message}");
+                }
+            }
+        }
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -323,25 +353,25 @@ namespace Frontend {
         public void SetWidth(double logicalWidth)
         {
             var (dpiX, _) = GetDpiFactors();
-            this.Width = logicalWidth / dpiX; // 反算成 WPF 单位
+            this.Width = logicalWidth / dpiX;
         }
 
         public void SetHeight(double logicalHeight)
         {
             var (_, dpiY) = GetDpiFactors();
-            this.Height = logicalHeight / dpiY; // 反算成 WPF 单位
+            this.Height = logicalHeight / dpiY;
         }
 
         public double GetWidth()
         {
             var (dpiX, _) = GetDpiFactors();
-            return this.Width * dpiX;  // 转换成逻辑像素
+            return this.Width * dpiX;
         }
 
         public double GetHeight()
         {
             var (_, dpiY) = GetDpiFactors();
-            return this.Height * dpiY;  // 转换成逻辑像素
+            return this.Height * dpiY;
         }
         
         public static Message ParseMessage(string json) {
@@ -367,6 +397,9 @@ namespace Frontend {
                     this.status.Path = msg.Path;
                     this.Display();
                 }
+                this.status.SoundPath = msg.SoundPath;
+                this.status.PlaySound = msg.PlaySound;
+                this.PlaySound();
                 this.SetWidth(msg.Width);
                 this.SetHeight(msg.Height);
                 this.SetLeft(msg.X);

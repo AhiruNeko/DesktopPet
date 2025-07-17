@@ -35,16 +35,20 @@ class Demo_Pet(Desktop_Pet):
             if self.status.X <= 0:
                 self.status.X = 0
                 vec_x = -vec_x
+                self.play_sound("muli.mp3")
             elif self.status.X + self.status.Width >= self.screen_width:
                 self.status.X = self.screen_width - self.status.Width
                 vec_x = -vec_x
+                self.play_sound("muli.mp3")
 
             if self.status.Y <= 0:
                 self.status.Y = 0
                 vec_y = -vec_y
+                self.play_sound("muli.mp3")
             elif self.status.Y + self.status.Height >= self.screen_height:
                 self.status.Y = self.screen_height - self.status.Height
                 vec_y = -vec_y
+                self.play_sound("muli.mp3")
 
             self.status.X += vec_x
             self.status.Y += vec_y

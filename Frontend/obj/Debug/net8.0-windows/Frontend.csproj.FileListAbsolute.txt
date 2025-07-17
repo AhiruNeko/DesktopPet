@@ -45,3 +45,10 @@ D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\Gma.Sy
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Frontend.csproj.AssemblyReference.cache
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\obj\Debug\net8.0-windows\Frontend.csproj.Up2Date
 D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\WpfAnimatedGif.dll
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\NAudio.dll
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\NAudio.Asio.dll
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\NAudio.Core.dll
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\NAudio.Midi.dll
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\NAudio.Wasapi.dll
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\NAudio.WinForms.dll
+D:\OKC\projects\codes\Others\DesktopPet\Frontend\bin\Debug\net8.0-windows\NAudio.WinMM.dll

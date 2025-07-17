@@ -80,6 +80,7 @@ class Desktop_Pet:
             self.status.set_type(send_type)
             await utils.send_data(self.status.serialization())
             self.pre_status = copy.deepcopy(self.status)
+            self.status.set_play_sound(False)
 
     async def execute_interactions(self, mouse_event: Mouse, recv_data):
         self.mouse_event = mouse_event
@@ -121,9 +122,15 @@ class Desktop_Pet:
             self.status.set_y(recv_data["Y"])
             self.status.set_width(recv_data["Width"])
             self.status.set_height(recv_data["Height"])
+            self.status.set_sound_path(recv_data["SoundPath"])
+            self.status.set_play_sound(recv_data["PlaySound"])
 
         if not self._motion_task or self._motion_task.done() or anime_cancel:
             await self.send_data("update")
+
+    def play_sound(self, path: str):
+        self.status.set_play_sound(True)
+        self.status.set_sound_path(path)
 
     def get_velocity(self):
         if len(self._position_history) < 2:

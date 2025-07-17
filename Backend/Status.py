@@ -7,6 +7,8 @@ class Status:
         self.pet = pet
         self.Type = "update"
         self.Path = ""
+        self.SoundPath = ""
+        self.PlaySound = False
         self.Width = 0
         self.Height = 0
         self.X = 0
@@ -18,6 +20,8 @@ class Status:
         return (
             self.Type == other.Type and
             self.Path == other.Path and
+            self.SoundPath == other.SoundPath and
+            self.PlaySound == other.PlaySound and
             self.Width == other.Width and
             self.Height == other.Height and
             self.X == other.X and
@@ -31,7 +35,7 @@ class Status:
 
         for k, v in self.__dict__.items():
             if k == "pet":
-                setattr(result, k, v)  # 👈 浅拷贝 pet
+                setattr(result, k, v)
             else:
                 setattr(result, k, copy.deepcopy(v, memo))
         return result
@@ -40,6 +44,8 @@ class Status:
         return {
             "Type": self.Type,
             "Path": self.Path,
+            "SoundPath": self.SoundPath,
+            "PlaySound": self.PlaySound,
             "Width": self.Width,
             "Height": self.Height,
             "X": self.X,
@@ -49,6 +55,13 @@ class Status:
     def set_path(self, path: str):
         relative_path = "../UserPets/" + self.pet.name + "/assets/" + path
         self.Path = os.path.abspath(relative_path)
+
+    def set_sound_path(self, path: str):
+        relative_path = "../UserPets/" + self.pet.name + "/assets/" + path
+        self.SoundPath = os.path.abspath(relative_path)
+
+    def set_play_sound(self, play_sound: bool):
+        self.PlaySound = play_sound
 
     def set_type(self, send_type: str):
         self.Type = send_type
