@@ -92,9 +92,3 @@ def interaction(priority=0):
         func._interaction_priority = priority
         return func
     return decorator
-
-
-def monitor(func):
-    func._is_monitor = True
-    return func
-

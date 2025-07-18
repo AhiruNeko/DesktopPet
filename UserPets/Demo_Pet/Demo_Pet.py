@@ -1,6 +1,6 @@
 from Backend.Desktop_Pet import Desktop_Pet
 from Backend.registry import register
-from Backend.utils import interaction, monitor
+from Backend.utils import interaction
 from Backend import Interaction_Result
 
 
@@ -10,8 +10,7 @@ class Demo_Pet(Desktop_Pet):
     def __init__(self):
         super().__init__()
 
-    @monitor
-    def pet_monitor(self):
+    def monitor(self):
         vec_x, vec_y = self.get_velocity()
         if (vec_x ** 2) + (vec_y ** 2) >= 25:
             self.status.set_path("5.gif")

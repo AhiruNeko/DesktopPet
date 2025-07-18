@@ -47,12 +47,6 @@ class Desktop_Pet:
         methods.sort(key=lambda x: x[0])
         self.interactions = [method for _, method in methods]
 
-        self.monitor = None
-        for attr_name in dir(self):
-            attr = getattr(self, attr_name)
-            if callable(attr) and getattr(attr, "_is_monitor", False):
-                self.monitor = attr
-
         self.mouse_event: Mouse
         self.pre_status = copy.deepcopy(self.status)
 
@@ -132,6 +126,9 @@ class Desktop_Pet:
         self.status.set_play_sound(True)
         self.status.set_sound_path(path)
 
+    def monitor(self):
+        pass
+
     def get_velocity(self):
         if len(self._position_history) < 2:
             return 0.0, 0.0
@@ -165,11 +162,10 @@ class Desktop_Pet:
         while True:
             self.frame_timer += 1
             self._position_history.append((self.status.X, self.status.Y))
-            if self.monitor:
-                if inspect.isawaitable(self.monitor):
-                    await self.monitor()
-                else:
-                    self.monitor()
+            if inspect.isawaitable(self.monitor):
+                await self.monitor()
+            else:
+                self.monitor()
             await self.send_data("update")
             await asyncio.sleep(self.frame_interval)
 
