@@ -1,0 +1,17 @@
+## Ignore Visual Studio temporary files, build results, and
+## personal user settings
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Rider IDE (如果你用的是 Rider)
+.idea/
+*.sln.iml
