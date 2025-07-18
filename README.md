@@ -48,7 +48,7 @@ class Your_Pet(Desktop_Pet):
         super().__init__()
 ```
 
-注意: 你的桌宠类应继承自`Desktop_Pet`, 并使用`@register`装饰类用于注册类.
+注意: 你的桌宠类应继承自`Desktop_Pet`, 并使用`@register`装饰器用于注册类.
 
 ## 三. 桌宠类可使用或访问的方法或属性
 
