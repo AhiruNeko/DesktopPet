@@ -1,17 +1,12 @@
-## Ignore Visual Studio temporary files, build results, and
-## personal user settings
+Frontend/bin/
+Frontend/obj/
 
-# User-specific files
-*.rsuser
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+Frontend/.idea/
+Frontend/.vs/
+Frontend/*.user
+Frontend/*.suo
+Frontend/*.DotSettings
 
-# Build results
-[Bb]in/
-[Oo]bj/
-
-# Rider IDE (如果你用的是 Rider)
-.idea/
-*.sln.iml
+Frontend/*.tmp
+Frontend/*.bak
+Frontend/*.log
