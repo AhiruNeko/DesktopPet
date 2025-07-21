@@ -21,7 +21,7 @@ Your_Pet/
 
 注意: 桌宠文件夹名称应与桌宠主程序名称一致.
 
-你可以在`settings.json`中通过设置`using`字段的值来设置运行时需要展示的桌宠. 例如:
+你可以在`DesktopPet/settings.json`中通过设置`using`字段的值来设置运行时需要展示的桌宠. 例如:
 
 ```json
 {
