@@ -139,7 +139,7 @@ class Desktop_Pet:
 
         return dx / frame_count, dy / frame_count
 
-    def start_motion(self, coro_fn: Callable[[], Awaitable], priority: int):
+    def start_motion(self, coro_fn: Callable[[], Awaitable], priority: int=0):
         if self._motion_task and not self._motion_task.done():
             if self._motion_priority <= priority:
                 return

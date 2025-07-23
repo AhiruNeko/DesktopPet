@@ -29,6 +29,27 @@ Your_Pet/
 }
 ```
 
+### 1.3 桌宠配置文件
+
+在`DesktopPet/UserPets/Your_Pet`中需包含一个桌宠配置文件`config.json`, 内容如下:
+
+```json
+{
+  "name": "Your_Pet",
+  "default": "default.png",
+  "width": 200,
+  "height": 200,
+  "x": 1000,
+  "y": 1000
+}
+```
+
+其中:
+
+- `name`必填, 且应与桌宠文件名一致
+- `default`必填, 用于设置默认的桌宠路径
+- 其余内容选填, 用于设置初始大小和位置
+
 ## 二. 创建并注册你的桌宠类
 
 在`Your_Pet.py`中创建并注册你的桌宠类, 注意: 类名称应该与主程序名称一致.
@@ -136,9 +157,9 @@ class Your_Pet(Desktop_Pet):
 | `Interaction_Result.FAIL`     | 交互命中但是执行失败, 不再进行其他交互的判定(即该交互不得与其他交互同时发生) |
 | `Interaction_Result.CONTINUE` | 交互发生, 但是继续进行其他交互的判定(即该交互可以与其他交互同时发生)     |
 
-注意: 当且仅当所有注册的交互函数都为命中(即返回`Interaction_Result.PASS`)时才会将桌宠的显示路径设置为默认路径.
+注意: 当且仅当所有注册的交互函数都未命中(即返回`Interaction_Result.PASS`)时才会将桌宠的显示路径设置为默认路径.
 
-例如, 我们希望鼠标位于桌宠上时能把桌宠的显示路径设置为一个新的路径`new_path`, 我们可以这么实现:
+例如, 我们希望鼠标位于桌宠上时能把桌宠的显示路径设置为一个新的路径`new_path`并播放声音`sound.mp3`, 我们可以这么实现:
 
 ```python
 class Your_Pet(Desktop_Pet):
@@ -147,6 +168,63 @@ class Your_Pet(Desktop_Pet):
     def mouse_over_pet_interaction(self):
         if self.mouse_event.mouse_over_pet:
             self.status.set_path("new_path")
+            self.play_sound("sound.mp3")
             return Interaction_Result.SUCCESS
         return Interaction_Result.PASS
 ```
+
+#### 4.2.2 添加交互动画
+
+在交互中我们可以添加动画. 例如, 我们希望用左键点击桌宠时桌宠能以30像素每秒向左移动3秒, 此时就需要在交互函数中添加这个动画:
+
+```python
+class Your_Pet(Desktop_Pet):
+    ...
+    @interaction()
+    def mouse_over_pet_interaction(self):
+        if self.mouse_event.mouse_left_down and self.mouse_event.mouse_over_pet:
+            self.start_motion(self.animation)
+            return Interaction_Result.SUCCESS
+        return Interaction_Result.PASS
+
+    async def animation(self):
+        for _ in range(90):
+            self.status.X -= 1
+            await self.wait_frames(1)
+```
+
+注意: 动画函数`animation`应为异步函数, 并在交互函数中使用`self.start_motion`启动该动画. 动画的默认帧率为30fps.
+
+#### 4.2.3 交互及其动画的优先级
+
+可以用`@interaction(priority=n)`来设置交互优先级, 值越小越优先执行, 优先级默认为0. 
+
+所有交互函数会按照优先级排序并依次检查是否触发, 并根据返回值判断是否要继续执行后续的交互函数. 例如:
+
+- 当优先级高的交互函数被触发并返回`Interaction_Result.SUCCESS`时, 其他更低的优先级的函数将**不再被触执行**.
+- 当优先级高的交互函数未触发并返回`Interaction_Result.PASS`时, 其他更低的优先级的函数将**继续被执行**.
+- 当优先级高的交互函数被触发并返回`Interaction_Result.CONTINUE`时, 其他更低的优先级的函数**将继续被执行**.
+
+在启动动画时, 也可以通过`self.start_motion(async_func, priority=n)`来设置动画优先级, 值越小越优先执行, 优先级默认为0.
+
+动画优先级规则如下:
+
+- 低优先级的动画可被高优先级的交互打断, 高优先级的动画无法被低优先级的交互打断.
+- 低优先级的动画可被高优先级的动画打断.
+
+### 4.3 自定义实时行为
+
+可以通过覆写父类方法`self.monitor`来设置实时行为. 例如, 需要实时监控桌宠速度, 如果速度大于10就显示图片`too_fast.png`, 否则显示`default.png`:
+
+```python
+class Your_Pet(Desktop_Pet):
+    ...
+    def monitor(self):
+        vx, vy = self.get_velocity()
+        if vx ** 2 + vy ** 2 > 100:
+            self.status.set_path("too_fast.png")
+        else:
+            self.status.set_path("default.png")
+```
+
+实时行为会每帧都执行, 并且享有最高优先级, 优先于一切交互的执行.
