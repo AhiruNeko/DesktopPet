@@ -11,5 +11,4 @@ Frontend/*.tmp
 Frontend/*.bak
 Frontend/*.log
 
-UserPets/*
-!UserPets/.keep
+UserPets/Demo_Pet
