@@ -1,15 +1,13 @@
-import functools
 import json
 import traceback
 
 import websockets
 
-from Backend import Interaction_Result
-from Desktop_Pet import Desktop_Pet
+from Backend.Desktop_Pet import Desktop_Pet
 import os
 import importlib.util
 from Backend.registry import REGISTRY
-from Mouse import Mouse
+from Backend.Mouse import Mouse
 
 connected = set()
 DATA = {}

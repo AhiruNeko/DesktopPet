@@ -67,7 +67,7 @@ class Desktop_Pet:
         return self.screen_width, self.screen_height
 
     async def send_data(self, send_type="update"):
-        import utils
+        from Backend import utils
         async with self._send_lock:
             if self.pre_status == self.status and send_type == "update":
                 return

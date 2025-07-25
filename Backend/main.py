@@ -1,6 +1,6 @@
 import asyncio
 import websockets
-import utils
+from Backend import utils
 
 
 async def main():
