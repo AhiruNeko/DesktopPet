@@ -47,7 +47,7 @@ class Desktop_Pet:
         methods.sort(key=lambda x: x[0])
         self.interactions = [method for _, method in methods]
 
-        self.mouse_event: Mouse
+        self.mouse_event = None
         self.pre_status = copy.deepcopy(self.status)
 
         self._motion_task: Optional[asyncio.Task] = None
