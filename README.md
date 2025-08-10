@@ -152,7 +152,7 @@ class Your_Pet(Desktop_Pet):
 
 | 交互结果                          | 含义                                       |
 |-------------------------------|------------------------------------------|
-| `Interaction_Result.Pass`     | 交互未命中(不发生), 继续下一个交互的判定                   |
+| `Interaction_Result.PASS`     | 交互未命中(不发生), 继续下一个交互的判定                   |
 | `Interaction_Result.SUCCESS`  | 交互发生, 不再进行其他交互的判定(即该交互不得与其他交互同时发生)       |
 | `Interaction_Result.FAIL`     | 交互命中但是执行失败, 不再进行其他交互的判定(即该交互不得与其他交互同时发生) |
 | `Interaction_Result.CONTINUE` | 交互发生, 但是继续进行其他交互的判定(即该交互可以与其他交互同时发生)     |
