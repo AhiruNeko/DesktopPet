@@ -14,11 +14,5 @@ Frontend/*.log
 UserPets/*
 !UserPets/Put_Your_Pets_Here
 
-STM32Interface/STM32F103Interface/.cproject
-STM32Interface/STM32F103Interface/.mxproject
-STM32Interface/STM32F103Interface/.project
-STM32Interface/STM32F103Interface/STM32F103C8TX_FLASH.ld
-STM32Interface/STM32F103Interface/STM32F103Interface.ioc
-STM32Interface/STM32F103Interface/Core/*.o
-STM32Interface/STM32F103Interface/Core/*.elf
-STM32Interface/STM32F103Interface/Core/*.bin
+STM32Interface/STM32F103Interface/*
+!STM32Interface/STM32F103Interface/Core
