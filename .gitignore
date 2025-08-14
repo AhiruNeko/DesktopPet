@@ -15,6 +15,6 @@ UserPets/*
 !UserPets/Put_Your_Pets_Here
 
 STM32Interface/STM32F103Interface/*
-!STM32Interface/STM32F103Interface/Core/*
-!STM32Interface/STM32F103Interface/Drivers/*
+!STM32Interface/STM32F103Interface/Core/**
+!STM32Interface/STM32F103Interface/Drivers/**
 !STM32Interface/STM32F103Interface/STM32F103Interface.ioc
