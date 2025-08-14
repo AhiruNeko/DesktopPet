@@ -1,3 +1,0 @@
-D:/OKC/projects/codes/Others/DesktopPet/STM32Interface/STM32F103Interface/cmake-build-debug/CMakeFiles/STM32F103Interface.elf.dir
-D:/OKC/projects/codes/Others/DesktopPet/STM32Interface/STM32F103Interface/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/OKC/projects/codes/Others/DesktopPet/STM32Interface/STM32F103Interface/cmake-build-debug/CMakeFiles/rebuild_cache.dir
