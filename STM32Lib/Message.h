@@ -14,7 +14,7 @@ public:
 
     bool contains(const string& key);
 
-    string encode();
+    string encode() const;
 
     void decode(const string& strMsg);
 
