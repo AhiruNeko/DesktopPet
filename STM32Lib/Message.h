@@ -1,25 +1,23 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
-#include <any>
 #include <string>
-#include <unordered_map>
 using namespace std;
 
 
 class Message {
 public:
-    void put(const string& key, const any& value);
-
-    any get(const string& key);
-
-    bool contains(const string& key);
-
-    string encode() const;
-
-    void decode(const string& strMsg);
+    Message();
+    void set(const char* key, float value);
+    float get(const char* key);
+    void addKey(const char* key);
+    void initialized();
 
 private:
-    unordered_map<string, any> msg;
+    static constexpr int MAX_ITEMS = 16;
+    float values[MAX_ITEMS];
+    const char* keys[MAX_ITEMS];
+    int count = 0;
+    bool init = false;
 };
 
 
