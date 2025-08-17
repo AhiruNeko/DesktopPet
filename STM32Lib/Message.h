@@ -11,6 +11,8 @@ public:
     float get(const char* key);
     void addKey(const char* key);
     void initialized();
+    char* encode() const;
+    void decode(const char* strMsg);
 
 private:
     static constexpr int MAX_ITEMS = 16;

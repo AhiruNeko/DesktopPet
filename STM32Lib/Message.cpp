@@ -36,16 +36,81 @@ void Message::addKey(const char* key) {
 }
 
 float Message::get(const char* key) {
-    int num = search(keys, count, key);
-    if (num == -1) return 0.0f;
-    return values[num];
+    if (init) {
+        int num = search(keys, count, key);
+        if (num == -1) return 0.0f;
+        return values[num];
+    }
+    return 0.0f;
 }
 
 void Message::set(const char* key, float value) {
-    int num = search(keys, count, key);
-    if (num == -1) return;
-    values[num] = value;
+    if (init) {
+        int num = search(keys, count, key);
+        if (num == -1) return;
+        values[num] = value;
+    }
 }
 
+char* Message::encode() const {
+    int bufSize = count * 64 + 2;
+    char* buffer = (char*)malloc(bufSize);
+    char* p = buffer;
+
+    *p++ = '{';
+
+    for (int i = 0; i < count; i++) {
+        p += sprintf(p, "\"%s\":", keys[i]);
+        p += sprintf(p, "%.*g", 9, values[i]);
+
+        if (i < count - 1) {
+            *p++ = ',';
+            *p++ = ' ';
+        }
+    }
+
+    *p++ = '}';
+    *p = '\0';
+
+    return buffer;
+}
+
+void Message::decode(const char* strMsg) {
+    if (!strMsg) return;
+    const char* p = strMsg;
+    while (*p && *p != '{') p++;
+    if (*p == '{') p++;
+
+    while (*p && *p != '}') {
+        while (*p == ' ' || *p == '\t' || *p == '\n') p++;
+
+        if (*p != '"') break;
+        p++;
+
+        const char* keyStart = p;
+        while (*p && *p != '"') p++;
+        if (*p != '"') break;
+        int keyLen = p - keyStart;
+        std::string key(keyStart, keyLen);
+        p++;
+
+        while (*p && (*p == ' ' || *p == ':')) p++;
+
+        const char* valStart = p;
+        while (*p && *p != ',' && *p != '}') p++;
+        int valLen = p - valStart;
+        std::string valStr(valStart, valLen);
+
+        float val = std::strtof(valStr.c_str(), nullptr);
+
+        for (int i = 0; i < count; i++) {
+            if (key == keys[i]) {
+                values[i] = val;
+                break;
+            }
+        }
+        if (*p == ',') p++;
+    }
+}
 
 
