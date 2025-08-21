@@ -1,6 +1,8 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
-#include <string>
+extern "C" {
+#include "usart.h"
+}
 using namespace std;
 
 
@@ -9,10 +11,11 @@ public:
     Message();
     void set(const char* key, float value);
     float get(const char* key);
-    void addKey(const char* key);
+    void add_key(const char* key);
     void initialized();
     char* encode() const;
-    void decode(const char* strMsg);
+    void decode(const char* str_msg);
+    HAL_StatusTypeDef send(UART_HandleTypeDef *huart);
 
 private:
     static constexpr int MAX_ITEMS = 16;
@@ -21,7 +24,5 @@ private:
     int count = 0;
     bool init = false;
 };
-
-
 
 #endif //MESSAGE_H
